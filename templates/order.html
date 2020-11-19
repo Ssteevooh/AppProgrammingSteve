@@ -9,10 +9,84 @@
   <meta name="author" content="SitePoint">
 
   <link rel="stylesheet" href="css/styles.css?v=1.0">
+	<style>
+	.center {
+		margin: auto;
+		width: 50%;
+	}
+	
+	.right {
+		float: right;
+	}
+	
+	table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+	
+	td, th {
+		width: auto;
+		border: 1px solid black;
+		border-collapse: collapse;
+	}
+	
+	th.order {
+		width: 6ch;
+	}
+	
+	tr:nth-child(even) {
+		background-color: LightGrey;
+	}
+	</style>
 
 </head>
 
 <body>
   <script src="js/scripts.js"></script>
+	<form class="center">
+		<table>
+			<tr>
+				<th class="order">Order</th>
+				<th>Product</th>
+				<th>Description</th>
+				<th>In stock</th>
+				<th>Price</th>
+				<th>ID</th>
+			</tr>
+			<tr>
+				<td><input type="number" id="order0" name="order0" value=0 size="4"></td>
+				<td>Oil filter</td>
+				<td>Filter oil</td>
+				<td>5</td>
+				<td>20.00 €</td>
+				<td>3572</td>
+			</tr>
+			<tr>
+				<td><input type="number" id="order1" name="order1" value=0 size="4"></td>
+				<td>Turtle Wax</td>
+				<td>Make car shiny</td>
+				<td>12</td>
+				<td>15.00 €</td>
+				<td>9483</td>
+			</tr>
+			<tr>
+				<td><input type="number" id="order2" name="order2" value=0 size="4"></td>
+				<td>Spare wheel</td>
+				<td>A new wheel</td>
+				<td>3</td>
+				<td>215.32€</td>
+				<td>1001</td>
+			</tr>
+			<tr>
+				<td><input type="number" id="order3" name="order3" value=0 size="4"></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</table>
+		<input class="right" type="submit" value="Order">
+	</form>
 </body>
 </html>
