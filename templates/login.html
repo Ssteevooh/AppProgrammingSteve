@@ -11,21 +11,45 @@
   <link rel="stylesheet" href="css/styles.css?v=1.0">
 
 </head>
+<style>
+.center {
+  margin: auto;
+  width: 60%;
+  border: 3px solid #ffffff;
+  padding: 10px;
+}
+
+
+
+</style>
 
 <body>
 
-  <div>
+  <h1 style="text-align:center;">Matonet</h1>
+  <p style="text-align:center;">Kirjautuminen verkkokauppaan.</p>
+  
+
+
+</form action="Login_get.php" method="get">
+  <div class="center">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username">
 </div>
 
-<div>
-    <label for="pass">Password (8 characters minimum):</label>
+<div class="center">
+    <label for="pass">Password:</label>
     <input type="password" id="pass" name="password"
-           minlength="8" required>
+           minlength="1" required>
 </div>
-
+<div class="center">
 <input type="submit" value="Sign in">
   <script src="js/scripts.js"></script>
+  <input type="reset">
+  </div>
+
+</form>
+
+
+
 </body>
 </html>
