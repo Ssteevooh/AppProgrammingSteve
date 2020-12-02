@@ -6,6 +6,9 @@ from http import HTTPStatus
 from models.product import Product
 
 
+# TODO ProductListResource
+
+
 class ProductResource(Resource):
 
     @jwt_required
@@ -40,11 +43,11 @@ class ProductResource(Resource):
         if current_user.role < 1:
             return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
 
-        product.name = data.get('name') or product.name
-        product.description = data.get('description') or product.description
-        product.stock = data.get('num_of_servings') or product.stock
-        product.price = data.get('cook_time') or product.price
-        product.size = data.get('ingredients') or product.size
+        product.name = json_data.get('name') or product.name
+        product.description = json_data.get('description') or product.description
+        product.stock = json_data.get('num_of_servings') or product.stock
+        product.price = json_data.get('cook_time') or product.price
+        product.size = json_data.get('ingredients') or product.size
 
         product.save()
 

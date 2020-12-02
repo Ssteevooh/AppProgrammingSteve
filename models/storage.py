@@ -11,7 +11,6 @@ class Storage(db.Model):
     created_at = db.Column(db.DateTime(), nullable=False, server_default=db.func.now())
     updated_at = db.Column(db.DateTime(), nullable=False, server_default=db.func.now(), onupdate=db.func.now())
 
-
     @classmethod
     def get_by_id(cls, id):
         return cls.query.filter_by(id=id).first()
@@ -19,7 +18,6 @@ class Storage(db.Model):
     @classmethod
     def get_by_free_storage(cls, storage_used):
         return cls.query.filter_by(storage_used).first()
-
 
     def save(self):
         db.session.add(self)
