@@ -10,7 +10,7 @@ from resources.product import ProductResource
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object("config.Config")
+    app.config.from_object(Config)
 
     register_extensions(app)
     register_resources(app)
