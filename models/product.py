@@ -15,6 +15,10 @@ class Product(db.Model):
     updated_at = db.Column(db.DateTime(), nullable=False, server_default=db.func.now(), onupdate=db.func.now())
 
     @classmethod
+    def get_all(cls):
+        return cls.query.filter_by().all()
+
+    @classmethod
     def get_by_name(cls, product_name):
         return cls.query.filter_by(product_name=product_name).first()
 

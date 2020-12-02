@@ -5,7 +5,8 @@ from flask_restful import Api
 from config import Config
 from extensions import db, jwt
 
-from resources.product import ProductResource
+from resources.token import TokenResource, RefreshResource, RevokeResource
+from resources.product import ProductResource, ProductListResource
 
 
 def create_app():
@@ -17,6 +18,7 @@ def create_app():
 
     return app
 
+
 def register_extensions(app):
     db.init_app(app)
     migrate = Migrate(app, db)
@@ -26,23 +28,29 @@ def register_extensions(app):
 def register_resources(app):
     api = Api(app)
 
+    api.add_resource(TokenResource, "/token")
+    api.add_resource(RefreshResource, "/refresh")
+    api.add_resource(RevokeResource, "/revoke")
+
     api.add_resource(ProductResource, "/product/<int:product_id>")
+    api.add_resource(ProductResource, "/products/")
+
 
 
 if __name__ == "__main__":
     app = create_app()
     app.run()
 
-# @app.route("/login", methods=["GET"])
-# def login():
-#    return render_template("login.html")
+@app.route("/login", methods=["GET"])
+def login():
+    return render_template("login.html")
 
 
-# @app.route("/order", methods=["GET"])
-# def order():
-#    return render_template("order.html")
+@app.route("/order", methods=["GET"])
+def order():
+    return render_template("order.html")
 
 
-# @app.route("/confirm", methods=["GET"])
-# def confirm():
-#    return render_template("Confirm.html")
+@app.route("/confirm", methods=["GET"])
+def confirm():
+    return render_template("Confirm.html")
