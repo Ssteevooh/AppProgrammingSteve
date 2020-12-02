@@ -11,15 +11,15 @@ from models.product import Product
 
 class ProductResource(Resource):
 
-    @jwt_required
+    # @jwt_required
     def get(self, product_id):
 
         json_data = request.get_json()
 
         current_user = get_jwt_identity()
 
-        if current_user is None:
-            return {'message': 'Unauthorized!'}, HTTPStatus.UNAUTHORIZED
+        # if current_user is None:
+        #   return {'message': 'Unauthorized!'}, HTTPStatus.UNAUTHORIZED
 
         product = Product.get_by_id(product_id=product_id)
 
