@@ -1,3 +1,5 @@
+.vs
+.vscode
 venv
 __pycache__
 migrations
