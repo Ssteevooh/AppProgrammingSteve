@@ -6,7 +6,6 @@ import sys
 import os
 import socket
 import threading
-import base64
 import logging
 from PyQt5 import QtWidgets, uic
 import login_view
@@ -45,6 +44,7 @@ class MatonetAdmin(QtWidgets.QWidget):
 
     def on_login_clicked(self, login_info):
 
+        # TODO fix connecting to the server
         try:
             self.server.connect((login_info["address"], login_info["port"]))
             self.server.sendall(self.login_info["username"])
@@ -55,9 +55,6 @@ class MatonetAdmin(QtWidgets.QWidget):
 
         # self.stacked_widget.setCurrentWidget(self.admin_widget)
         # self.admin_widget_thread()
-
-    def on_send_clicked(self, message):
-        self.server.sendall(self.to_base64(message))
 
 
 def run():

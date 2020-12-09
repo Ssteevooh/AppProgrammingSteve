@@ -38,7 +38,8 @@ class LoginView(QtWidgets.QWidget):
         login_info = {
             "address": self.address_input.text(),
             "port": int(self.port_input.text()),
-            "username": self.username_input.text()
+            "username": self.username_input.text(),
+            "password": self.password_input.text()
         }
         self.login_signal.emit(login_info)
 
