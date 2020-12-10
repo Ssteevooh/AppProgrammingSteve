@@ -56,14 +56,14 @@ class ProductListResource(Resource):
 
 class ProductResource(Resource):
 
-    @jwt_required
+    #@jwt_required
     def get(self, product_id):
 
         current_user = get_jwt_identity()
 
         # For every role
-        if current_user is None:
-            return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
+        #if current_user is None:
+            #return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
 
         product = Product.get_by_id(product_id=product_id)
 
