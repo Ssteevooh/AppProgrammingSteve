@@ -39,7 +39,7 @@ class ProductListResource(Resource):
 
         current_user = get_jwt_identity()
 
-        # Only for admins
+        #Only for admins
         if current_user is None or current_user.role < 2:
             return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
 
@@ -61,7 +61,7 @@ class ProductResource(Resource):
 
         current_user = get_jwt_identity()
 
-        # For every role
+        #For every role
         if current_user is None:
             return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
 
