@@ -56,7 +56,7 @@ class ProductListResource(Resource):
 
 class ProductResource(Resource):
 
-    @jwt_required
+    #@jwt_required
     def get(self, product_id):
 
         current_user = get_jwt_identity()
