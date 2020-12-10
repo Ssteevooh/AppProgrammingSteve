@@ -30,24 +30,17 @@
   
 
 
-</form action="Login_get.php" method="get">
-  <div class="center">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username">
-</div>
 
 <div class="center">
-    <label for="pass">Password:</label>
-    <input type="password" id="pass" name="password"
-           minlength="1" required>
+<p>Username</p>
+<input type="text" id="username" name="username"><br><br>
+<p>Password</p>
+<input type="text" id="password" name="password"><br><br>
+<button type="button" onclick="getToken()">Login</button>
 </div>
-<div class="center">
-<input type="submit" value="Sign in">
-  <script src="js/scripts.js"></script>
-  <input type="reset">
-  </div>
+<script src="login.js"></script>
 
-</form>
+
 
 
 
