@@ -4,19 +4,19 @@ __license__ = "0BSD"
 
 import sys
 import os
-import socket
 import threading
 import logging
 from PyQt5 import QtWidgets, uic
 import login_view
-
+import requests
+import json
+import site
 
 class MatonetAdmin(QtWidgets.QWidget):
 
     def __init__(self):
         super(MatonetAdmin, self).__init__()
         self.init_ui()
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.thread = threading.Thread(target=self.server_listener, args=(1,), daemon=True)
         logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
@@ -43,18 +43,25 @@ class MatonetAdmin(QtWidgets.QWidget):
         sys.exit(0)
 
     def on_login_clicked(self, login_info):
-
-        # TODO fix connecting to the server
+        url = "http://" + login_info["address"] + ":5000/"
+        
         try:
-            self.server.connect((login_info["address"], login_info["port"]))
-            self.server.sendall(self.login_info["username"])
+            response = requests.post(url + "token", json={
+                "username": login_info["username"], "password": login_info["username"]}, timeout=2)
+            tokens = json.loads(response.text)
+            headers = {
+                "Authorization": "Bearer %s" % tokens["access_token"]
+            }
+            db = requests.get(url + "products", headers=headers)
+            products = json.loads(db.text)
+            print(products)
 
         except ConnectionRefusedError as e:
             self.login_widget.show_warning(e)
             return
 
-        # self.stacked_widget.setCurrentWidget(self.admin_widget)
-        # self.admin_widget_thread()
+            # self.stacked_widget.setCurrentWidget(self.admin_widget)
+            # self.admin_widget_thread()
 
 
 def run():
