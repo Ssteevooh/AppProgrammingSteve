@@ -7,7 +7,7 @@ import os
 import threading
 import logging
 from PyQt5 import QtWidgets, uic
-import login_view
+import login_view, product_view
 import requests
 import json
 import site
@@ -26,18 +26,24 @@ class MatonetAdmin(QtWidgets.QWidget):
 
         # Create QWidget instances
         self.login_widget = login_view.LoginView()
-
+        self.product_widget = product_view.ProductView()
         # Add QWidget instances to stackedWidget
         self.stacked_widget.addWidget(self.login_widget)
+        self.stacked_widget.addWidget(self.product_widget)
 
 
         # Connect exit_buttons
         self.login_widget.exit_button.clicked.connect(
             self.on_exit_button_clicked)
+        
+        self.product_widget.exit_button.clicked.connect(
+            self.on_exit_button_clicked)
 
         # Connect signals
         self.login_widget.login_signal.connect(
             self.on_login_clicked)
+        self.product_widget.update_signal.connect(
+            self.on_update_clicked)
 
     def on_exit_button_clicked(self):
         sys.exit(0)
@@ -60,8 +66,11 @@ class MatonetAdmin(QtWidgets.QWidget):
             self.login_widget.show_warning(e)
             return
 
-            # self.stacked_widget.setCurrentWidget(self.admin_widget)
+        self.stacked_widget.setCurrentWidget(self.product_widget)
             # self.admin_widget_thread()
+
+    def on_update_clicked(self, product_info):
+        print(product_info)
 
 
 def run():
