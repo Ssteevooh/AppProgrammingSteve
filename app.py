@@ -8,6 +8,7 @@ from extensions import db, jwt
 from resources.token import TokenResource, RefreshResource, RevokeResource
 from resources.pages import LoginResource, OrderResource, ConfirmResource
 from resources.product import ProductResource, ProductListResource
+from resources.user import UserResource
 
 
 def create_app():
@@ -36,6 +37,9 @@ def register_resources(app):
     api.add_resource(LoginResource, "/")
     api.add_resource(OrderResource, "/order")
     api.add_resource(ConfirmResource, "/confirm")
+
+    api.add_resource(UserResource, "/username/<username>")
+    
 
     api.add_resource(ProductResource, "/product/<int:product_id>")
     api.add_resource(ProductListResource, "/products")
