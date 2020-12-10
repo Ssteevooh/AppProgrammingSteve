@@ -28,7 +28,7 @@ class StorageListResource(Resource):
 
         storages = Storage.get_all()
 
-        return storage_list_schema.dump(storages).data, HTTPStatus.OK
+        return storage_list_schema.dump(storages), HTTPStatus.OK
 
     @jwt_required
     def post(self):
@@ -49,7 +49,7 @@ class StorageListResource(Resource):
         storage = Storage(**data)
         storage.save()
 
-        return storage_schema.dump(storage).data, HTTPStatus.CREATED
+        return storage_schema.dump(storage), HTTPStatus.CREATED
 
 
 class StorageResource(Resource):
@@ -68,7 +68,7 @@ class StorageResource(Resource):
         if storage is None:
             return {'message': 'Storage not found'}, HTTPStatus.NOT_FOUND
 
-        return storage_schema.dump(storage).data, HTTPStatus.OK
+        return storage_schema.dump(storage), HTTPStatus.OK
 
     @jwt_required
     def patch(self, storage_id):
@@ -96,7 +96,7 @@ class StorageResource(Resource):
 
         storage.save()
 
-        return storage_schema.dump(storage).data, HTTPStatus.OK
+        return storage_schema.dump(storage), HTTPStatus.OK
 
     @jwt_required
     def delete(self, storage_id):

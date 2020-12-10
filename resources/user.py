@@ -27,4 +27,4 @@ class UserResource(Resource):
         if user is None:
             return {'message': 'User not found'}, HTTPStatus.NOT_FOUND
 
-        return user_schema.dump(user).data, HTTPStatus.OK
+        return user_schema.dump(user), HTTPStatus.OK

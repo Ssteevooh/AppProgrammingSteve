@@ -30,7 +30,7 @@ class ProductListResource(Resource):
 
         products = Product.get_all()
 
-        return product_list_schema.dump(products).data, HTTPStatus.OK
+        return product_list_schema.dump(products), HTTPStatus.OK
 
     @jwt_required
     def post(self):
@@ -51,7 +51,7 @@ class ProductListResource(Resource):
         product = Product(**data)
         product.save()
 
-        return product_schema.dump(product).data, HTTPStatus.CREATED
+        return product_schema.dump(product), HTTPStatus.CREATED
 
 
 class ProductResource(Resource):
@@ -70,7 +70,7 @@ class ProductResource(Resource):
         if product is None:
             return {'message': 'Product not found'}, HTTPStatus.NOT_FOUND
 
-        return product_schema.dump(product).data, HTTPStatus.OK
+        return product_schema.dump(product), HTTPStatus.OK
 
     @jwt_required
     def patch(self, product_id):
@@ -101,7 +101,7 @@ class ProductResource(Resource):
 
         product.save()
 
-        return product_schema.dump(product).data, HTTPStatus.OK
+        return product_schema.dump(product), HTTPStatus.OK
 
     @jwt_required
     def delete(self, product_id):
