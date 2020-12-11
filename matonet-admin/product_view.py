@@ -27,9 +27,8 @@ class ProductView(QtWidgets.QWidget):
     def show_warning(self, e):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
-        msg.setText("The server is not responding")
-        msg.setWindowTitle("Connection error")
-        msg.setDetailedText(str(e))
+        msg.setWindowTitle("Invalid values")
+        msg.setText("Check the values you entered\n" + str(e))
         msg.setStandardButtons(QMessageBox.Ok)
         msg.exec_()
 

@@ -80,7 +80,7 @@ class ProductResource(Resource):
         current_user = get_jwt_identity()
 
         # TODO implement patch visibilities for roles ie client can decrement stock
-        if current_user.role < 1:
+        if current_user is None:
             return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
 
         data, errors = product_schema.load(data=json_data)
@@ -93,11 +93,13 @@ class ProductResource(Resource):
         if product is None:
             return {'message': 'Product not found'}, HTTPStatus.NOT_FOUND
 
-        product.name = data.get('name') or product.name
-        product.description = data.get('description') or product.description
-        product.stock = data.get('num_of_servings') or product.stock
-        product.price = data.get('cook_time') or product.price
-        product.size = data.get('ingredients') or product.size
+        product.id = data.get("product_id") or product.product_id
+        product.name = data.get("product_name") or product.name
+        product.description = data.get("description") or product.description
+        product.steps = data.get("stock") or product.steps
+        product.tools = data.get("price") or product.tools
+        product.cost = data.get("size") or product.cost
+        #product.updated_at = data.get("updated_at")
 
         product.save()
 
@@ -109,7 +111,7 @@ class ProductResource(Resource):
         current_user = get_jwt_identity()
 
         # Only for  admins
-        if current_user.role != 2:
+        if current_user is None:
             return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
 
         product = Product.get_by_id(product_id=product_id)

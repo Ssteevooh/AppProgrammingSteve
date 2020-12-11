@@ -20,8 +20,8 @@ class UserResource(Resource):
 
         current_user = get_jwt_identity()
 
-       #if current_user is None:
-            #return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
+        if current_user is None:
+            return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
 
 
         if user is None:
