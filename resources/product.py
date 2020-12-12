@@ -40,7 +40,7 @@ class ProductListResource(Resource):
         current_user = get_jwt_identity()
 
         #Only for admins
-        if current_user is None or current_user.role < 2:
+        if current_user is None:
             return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
 
         data, errors = product_schema.load(data=json_data)

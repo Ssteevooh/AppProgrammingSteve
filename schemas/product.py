@@ -30,6 +30,5 @@ class ProductSchema(Schema):
     stock = fields.Integer(validate=validate_stock)
     price = fields.Float(validate=validate_price)
     size = fields.Integer(validate=validate_size)
-
-    created_at = fields.DateTime(dump_only=True)
-    updated_at = fields.DateTime(dump_only=True)
+    #created_at = fields.DateTime(dump_only=True)
+    #updated_at = fields.DateTime(dump_only=True)
