@@ -19,7 +19,8 @@ class MatonetAdmin(QtWidgets.QWidget):
     def __init__(self):
         super(MatonetAdmin, self).__init__()
         self.init_ui()
-        logging.basicConfig(filename='matonet-admin.log', format='%(asctime)s-%(levelname)s:%(message)s', level=logging.DEBUG)
+        #logging.basicConfig(filename='matonet-admin.log', format='%(asctime)s-%(levelname)s:%(message)s', level=logging.DEBUG)
+        logging.basicConfig(format='%(asctime)s-%(levelname)s:%(message)s', level=logging.DEBUG)
 
     def init_ui(self):
         path = os.path.dirname(os.path.abspath(__file__)) + '/main_window.ui'
@@ -50,7 +51,22 @@ class MatonetAdmin(QtWidgets.QWidget):
             self.on_update_clicked)
         self.product_widget.user_signal.connect(
             self.on_user_clicked)
+    
+    def login(self, login_info):
+        self.url = "http://" + login_info["address"] + ":5000/"
+        response = requests.post(self.url + "token", json={
+                "username": login_info["username"], "password": login_info["username"]}, timeout=2)
+        self.tokens = json.loads(response.text)
 
+    def logout(self):
+        headers = {"Authorization": "Bearer %s" % self.tokens["access_token"]}
+        requests.post(self.url + "revoke", json={}, headers=headers)
+
+    def fetch_from_db(self, endpoint):
+        self.refresh_token()
+        headers = {"Authorization": "Bearer %s" % self.tokens["access_token"]}
+        return requests.get(self.url + endpoint, headers=headers)
+    
     def refresh_token(self):
         headers = {
                 "Authorization": "Bearer %s" % self.tokens["refresh_token"]
@@ -61,32 +77,25 @@ class MatonetAdmin(QtWidgets.QWidget):
 
     def on_exit_button_clicked(self):
         if self.stacked_widget.currentWidget() is not self.login_widget:
-            headers = {"Authorization": "Bearer %s" % self.tokens["access_token"]}
-            requests.post(self.url + "revoke", json={}, headers=headers)
-            logging.info("%s logged out." % self.login_info["username"])
-        
+            self.logout()
+            logging.info("User %s logged out." % self.user)
         sys.exit(0)
 
     def on_login_clicked(self, login_info):
-        self.login_info = login_info
-        self.url = "http://" + login_info["address"] + ":5000/"
-        
+        self.login(login_info)
+        self.user = login_info["username"]
         try:
-            response = requests.post(self.url + "token", json={
-                "username": login_info["username"], "password": login_info["username"]}, timeout=2)
-            self.tokens = json.loads(response.text)
-            headers = {"Authorization": "Bearer %s" % self.tokens["access_token"]}
-            db = requests.get(self.url + "products", headers=headers)
-            self.products = json.loads(db.text)
+            product_db = self.fetch_from_db("products")
+            self.products = json.loads(product_db.text)
         except requests.ConnectionError as e:
             self.login_widget.show_warning(e)
             return
         except requests.Timeout as e:
             self.login_widget.show_warning(e)
             return
-        logging.info("%s logged in." % self.login_info["username"])
+        logging.info("User %s logged in." % self.user)
         self.stacked_widget.setCurrentWidget(self.product_widget)
-        
+        logging.info("User %s is viewing products." % self.user)
         for row, product in enumerate(self.products):
             self.product_widget.set_products(product, row)
 
@@ -94,11 +103,10 @@ class MatonetAdmin(QtWidgets.QWidget):
         if self.stacked_widget.currentWidget() is self.product_widget:
             self.refresh_token()
             self.product_widget.update_products(self.products, self.url, self.tokens["access_token"])
-
+            logging.info("products updated by %s" % self.login_info["username"])
     def on_user_clicked(self, int):
-        print("Users!")
         self.stacked_widget.setCurrentWidget(self.user_widget)
-
+        logging.info("User %s is viewing users." % self.user)
 def run():
     APP = QtWidgets.QApplication(sys.argv)
     APP_WINDOW = MatonetAdmin()
