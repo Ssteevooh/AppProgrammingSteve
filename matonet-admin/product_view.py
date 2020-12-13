@@ -26,6 +26,7 @@ class ProductView(QtWidgets.QWidget):
         "updated_at"
     )
 
+    user_signal = pyqtSignal(int)
     update_signal = pyqtSignal(list)
 
     def __init__(self):
@@ -115,7 +116,9 @@ class ProductView(QtWidgets.QWidget):
             except Exception as e:
                 self.show_warning(e)
             
-
+    @pyqtSlot()
+    def on_users_button_clicked(self):
+        self.user_signal.emit(1)
 
     @pyqtSlot()
     def on_update_button_clicked(self):

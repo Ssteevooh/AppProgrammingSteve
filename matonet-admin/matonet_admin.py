@@ -6,7 +6,7 @@ import sys
 import os
 import logging
 from PyQt5 import QtWidgets, uic
-import login_view, product_view
+import login_view, product_view, user_view
 import requests
 import json
 import site
@@ -28,17 +28,19 @@ class MatonetAdmin(QtWidgets.QWidget):
         # Create QWidget instances
         self.login_widget = login_view.LoginView()
         self.product_widget = product_view.ProductView()
-        
+        self.user_widget = user_view.UserView()
+
         # Add QWidget instances to stackedWidget
         self.stacked_widget.addWidget(self.login_widget)
         self.stacked_widget.addWidget(self.product_widget)
-
+        self.stacked_widget.addWidget(self.user_widget)
 
         # Connect exit_buttons
         self.login_widget.exit_button.clicked.connect(
             self.on_exit_button_clicked)
-        
         self.product_widget.exit_button.clicked.connect(
+            self.on_exit_button_clicked)
+        self.user_widget.exit_button.clicked.connect(
             self.on_exit_button_clicked)
 
         # Connect signals
@@ -46,6 +48,8 @@ class MatonetAdmin(QtWidgets.QWidget):
             self.on_login_clicked)
         self.product_widget.update_signal.connect(
             self.on_update_clicked)
+        self.product_widget.user_signal.connect(
+            self.on_user_clicked)
 
     def refresh_token(self):
         headers = {
@@ -85,12 +89,15 @@ class MatonetAdmin(QtWidgets.QWidget):
         
         for row, product in enumerate(self.products):
             self.product_widget.set_products(product, row)
-    
+
     def on_update_clicked(self):
         if self.stacked_widget.currentWidget() is self.product_widget:
             self.refresh_token()
             self.product_widget.update_products(self.products, self.url, self.tokens["access_token"])
 
+    def on_user_clicked(self, int):
+        print("Users!")
+        self.stacked_widget.setCurrentWidget(self.user_widget)
 
 def run():
     APP = QtWidgets.QApplication(sys.argv)

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>product_view</class>
- <widget class="QWidget" name="product_view">
+ <class>user_view</class>
+ <widget class="QWidget" name="user_view">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>726</width>
     <height>600</height>
    </rect>
   </property>
@@ -20,21 +20,34 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="5" column="4">
-    <widget class="QPushButton" name="update_button">
-     <property name="text">
-      <string>Update</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
+   <item row="4" column="0">
     <widget class="QPushButton" name="exit_button">
      <property name="text">
       <string>Exit</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="5">
+   <item row="4" column="1">
+    <spacer name="button_spacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="2">
+    <widget class="QPushButton" name="update_button">
+     <property name="text">
+      <string>Update</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="3">
     <widget class="QTableWidget" name="product_table_widget">
      <property name="baseSize">
       <size>
@@ -46,7 +59,7 @@
       <number>10</number>
      </property>
      <property name="columnCount">
-      <number>8</number>
+      <number>7</number>
      </property>
      <attribute name="horizontalHeaderVisible">
       <bool>true</bool>
@@ -72,32 +85,27 @@
      <row/>
      <column>
       <property name="text">
-       <string>Product ID</string>
+       <string>User ID</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Name</string>
+       <string>Role</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Description</string>
+       <string>Username</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Stock</string>
+       <string>Passhash</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Price</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Size</string>
+       <string>Is active</string>
       </property>
      </column>
      <column>
@@ -111,40 +119,6 @@
       </property>
      </column>
     </widget>
-   </item>
-   <item row="5" column="3">
-    <widget class="QPushButton" name="create_button">
-     <property name="text">
-      <string>Create</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QPushButton" name="users_button">
-     <property name="text">
-      <string>Users</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QPushButton" name="storage_button">
-     <property name="text">
-      <string>Storage</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
-    <spacer name="button_spacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

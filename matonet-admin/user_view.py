@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QMessageBox
 
 class UserView(QtWidgets.QWidget):
 
-    user_signal = pyqtSignal(None)
+    user_signal = pyqtSignal(int)
 
     def __init__(self):
         super(UserView, self).__init__()
@@ -27,16 +27,15 @@ class UserView(QtWidgets.QWidget):
     def show_warning(self, e):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
-        msg.setText("The server is not responding")
-        msg.setWindowTitle("Connection error")
-        msg.setDetailedText(str(e))
+        msg.setWindowTitle("Invalid values")
+        msg.setText("Check the values you entered\n" + str(e))
         msg.setStandardButtons(QMessageBox.Ok)
         msg.exec_()
 
     @pyqtSlot()
     def on_update_button_clicked(self):
 
-        self.user_signal.emit()
+        self.user_signal.emit(1)
 
 
 def run():
