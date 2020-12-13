@@ -4,7 +4,7 @@ __license__ = "0BSD"
 
 import sys
 import os
-import logging
+from logger import log
 from PyQt5 import QtWidgets, uic
 import login_view, product_view, user_view
 import requests
@@ -18,14 +18,6 @@ class MatonetAdmin(QtWidgets.QWidget):
     def __init__(self):
         super(MatonetAdmin, self).__init__()
         self.init_ui()
-
-        # Commented out for instant debugging - We'll use this in production
-        """logging.basicConfig(filename='matonet-admin.log',
-                            format='%(asctime)s-%(levelname)s:%(message)s',
-                            level=logging.DEBUG)"""
-
-        logging.basicConfig(format='%(asctime)s-%(levelname)s:%(message)s',
-                            level=logging.DEBUG)
 
     def init_ui(self):
         path = os.path.dirname(os.path.abspath(__file__)) + '/main_window.ui'
@@ -58,11 +50,13 @@ class MatonetAdmin(QtWidgets.QWidget):
             self.on_user_clicked)
         self.user_widget.product_signal.connect(
             self.on_product_clicked)
+        self.user_widget.update_signal.connect(
+            self.on_update_clicked)
 
     def login(self, login_info):
         try:
+            self.login_info = login_info
             self.url = "http://" + login_info["address"] + ":5000/"
-            print(login_info)
             response = requests.post(self.url + "token", json={
                 "username": login_info["username"], "password": login_info["password"]}, timeout=2)
             self.tokens = json.loads(response.text)
@@ -90,7 +84,7 @@ class MatonetAdmin(QtWidgets.QWidget):
     def on_exit_button_clicked(self):
         if self.stacked_widget.currentWidget() is not self.login_widget:
             self.logout()
-            logging.info("User %s logged out." % self.user)
+            log.info("User %s logged out." % self.user)
         sys.exit(0)
 
     def on_login_clicked(self, login_info):
@@ -109,23 +103,27 @@ class MatonetAdmin(QtWidgets.QWidget):
             self.login_widget.show_warning(e)
             return
 
-        logging.info("User %s logged in." % self.user)
+        log.info("User %s logged in." % self.user)
         self.stacked_widget.setCurrentWidget(self.product_widget)
-        logging.info("User %s is viewing products." % self.user)
+        log.info("User %s is viewing products." % self.user)
         for row, product in enumerate(self.products):
             self.product_widget.set_products(product, row)
 
     def on_update_clicked(self):
         if self.stacked_widget.currentWidget() is self.product_widget:
             self.refresh_token()
-            self.product_widget.update_products(self.products, self.url, self.tokens["access_token"])
-            logging.info("products updated by %s" % self.login_info["username"])
+            self.product_widget.update_products(self.login_info["username"],
+                                                self.products, self.url, self.tokens["access_token"])
+        if self.stacked_widget.currentWidget() is self.user_widget:
+            self.refresh_token()
+            self.user_widget.update_users(self.login_info["username"],
+                                          self.users, self.url, self.tokens["access_token"])
 
     def on_product_clicked(self, int):
         product_db = self.fetch_from_db("products")
         self.products = json.loads(product_db.text)
         self.stacked_widget.setCurrentWidget(self.product_widget)
-        logging.info("User %s is viewing products." % self.user)
+        log.info("User %s is viewing products." % self.user)
         for row, product in enumerate(self.products):
             self.product_widget.set_products(product, row)
 
@@ -133,7 +131,7 @@ class MatonetAdmin(QtWidgets.QWidget):
         user_db = self.fetch_from_db("users")
         self.users = json.loads(user_db.text)
         self.stacked_widget.setCurrentWidget(self.user_widget)
-        logging.info("User %s is viewing users." % self.user)
+        log.info("User %s is viewing users." % self.user)
         for row, user in enumerate(self.users):
             self.user_widget.set_users(user, row)
 

@@ -49,9 +49,9 @@ class UserListResource(Resource):
 class UserResource(Resource):
 
     @jwt_required
-    def get(self, username):
+    def get(self, user_id):
 
-        user = User.get_by_username(username=username)
+        user = User.get_by_id(user_id=user_id)
 
         current_user = get_jwt_identity()
 
@@ -62,3 +62,31 @@ class UserResource(Resource):
             return {'message': 'User not found'}, HTTPStatus.NOT_FOUND
 
         return user_schema.dump(user), HTTPStatus.OK
+
+    @jwt_required
+    def patch(self, user_id):
+
+        json_data = request.get_json()
+        current_user = get_jwt_identity()
+
+        user = User.get_by_id(user_id=user_id)
+
+        if current_user is None and user.role > 1:
+            return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
+
+        data, errors = user_schema.load(data=json_data)
+        if errors:
+            return {'message': 'Validation errors', 'errors': errors}, HTTPStatus.BAD_REQUEST
+
+        if user is None:
+            return {'message': 'User not found'}, HTTPStatus.NOT_FOUND
+        user.id = user.user_id
+        user.role = data.get("role") or user.role
+        user.name = data.get("username") or user.name
+        user.password = data.get("password") or user.password
+        user.is_active = data.get("is_active") or user.is_active
+        user.created_at = user.created_at
+        user.updated_at = user.updated_at
+        user.save()
+
+        return {'message': 'Updated'}, HTTPStatus.OK

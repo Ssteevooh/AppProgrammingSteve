@@ -6,7 +6,8 @@ __license__ = "0BSD"
 
 import os
 import sys
-
+import requests
+from logger import log
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox
@@ -24,7 +25,7 @@ class UserView(QtWidgets.QWidget):
         "updated_at"
     )
 
-    update_signal = pyqtSignal(int)
+    update_signal = pyqtSignal(list)
     product_signal = pyqtSignal(int)
 
     def __init__(self):
@@ -43,19 +44,41 @@ class UserView(QtWidgets.QWidget):
         msg.setStandardButtons(QMessageBox.Ok)
         msg.exec_()
 
-    @pyqtSlot()
-    def on_update_button_clicked(self):
-        self.update_signal.emit(1)
-
-    @pyqtSlot()
-    def on_product_button_clicked(self):
-        self.product_signal.emit(1)
+    def delete_uneditables(self, user):
+        user.pop("user_id", None)
+        user.pop("role", None)
+        user.pop("created_at", None)
+        user.pop("updated_at", None)
+        return user
 
     def set_users(self, user, row):
         for column in range(self.user_table_widget.columnCount()):
             item = QtWidgets.QTableWidgetItem()
             item.setText(str(user[self.keys[column]]))
             self.user_table_widget.setItem(row, column, item)
+
+    def update_users(self, username, users, url, token):
+        updated_users = self.get_users()
+        for i in range(len(users)):
+            try:
+                if updated_users[i] != users[i]:
+                    updated_json = self.delete_uneditables(updated_users[i])
+                    headers = {"Authorization": "Bearer %s" % token}
+                    print(updated_json)
+                    response = requests.patch(url + "user/%d" % i, headers=headers, json=updated_json)
+                    if response.status_code == 200:
+                        log.info("Users updated by %s" % username)
+                    else:
+                        log.error("Failed to update user %s" % username)
+            except requests.Timeout as e:
+                self.show_warning(e)
+                return
+            except ValueError as e:
+                self.show_warning(e)
+                return
+            except TypeError as e:
+                self.show_warning(e)
+                return
 
     def get_users(self):
         users = []
@@ -73,12 +96,12 @@ class UserView(QtWidgets.QWidget):
                         if column in (2, 3):
                             user[self.keys[column]] = item.text()
                         if column == 4:
-                            if float(item.text()) > 0:
-                                user[self.keys[column]] = bool(item.text())
-                            else:
-                                raise ValueError
+                            user[self.keys[column]] = item.text()
                         if column in (5, 6):
                             user[self.keys[column]] = item.text()
+                    except KeyError as e:
+                        self.show_warning(e)
+                        return
                     except TypeError as e:
                         self.show_warning(e)
                         return
@@ -89,6 +112,15 @@ class UserView(QtWidgets.QWidget):
             if self.user_table_widget.item(row, 0) is not None and item.text != "":
                 users.append(user)
         return users
+
+    @pyqtSlot()
+    def on_product_button_clicked(self):
+        self.product_signal.emit(1)
+
+    @pyqtSlot()
+    def on_update_button_clicked(self):
+        users = self.get_users()
+        self.update_signal.emit(users)
 
 
 def run():

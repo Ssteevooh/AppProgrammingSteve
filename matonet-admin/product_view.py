@@ -6,6 +6,7 @@ __license__ = "0BSD"
 import os
 import sys
 import requests
+from logger import log
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox
@@ -55,6 +56,25 @@ class ProductView(QtWidgets.QWidget):
             item.setText(str(product[self.keys[column]]))
             self.product_table_widget.setItem(row, column, item)
 
+    def update_products(self, username, products, url, token):
+        updated_products = self.get_products()
+        for i in range(len(products)):
+            try:
+                if updated_products[i] != products[i]:
+                    updated_json = self.delete_uneditables(updated_products[i])
+                    headers = {"Authorization": "Bearer %s" % token}
+                    requests.patch(url + "product/%d" % i, headers=headers, json=updated_json)
+                    log.info("Products updated by %s" % username)
+            except requests.Timeout as e:
+                self.show_warning(e)
+                return
+            except ValueError as e:
+                self.show_warning(e)
+                return
+            except TypeError as e:
+                self.show_warning(e)
+                return
+
     def get_products(self):
         products = []
         product = {}
@@ -87,29 +107,6 @@ class ProductView(QtWidgets.QWidget):
             if self.product_table_widget.item(row, 0) is not None and item.text != "":
                 products.append(product)
         return products
-
-    def update_products(self, products, url, token):
-        updated_products = self.get_products()
-        for i in range(len(products)):
-            try:
-                if updated_products[i] != products[i]:
-                    updated_json = self.delete_uneditables(updated_products[i])
-                    print(updated_json)
-                headers = {"Authorization": "Bearer %s" % token}
-                try:
-                    requests.patch(url + "product/%d" % i, headers=headers, json=updated_json)
-                except requests.Timeout as e:
-                    self.show_warning(e)
-                    pass
-                except ValueError as e:
-                    self.show_warning(e)
-                    pass
-                except TypeError as e:
-                    self.show_warning(e)
-                    pass
-
-            except Exception as e:
-                self.show_warning(e)
 
     @pyqtSlot()
     def on_users_button_clicked(self):

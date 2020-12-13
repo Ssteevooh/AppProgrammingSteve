@@ -11,9 +11,9 @@ class UserSchema(Schema):
         ordered = False
 
     user_id = fields.Integer(dump_only=True)
-    role = fields.Integer(required=True, validate=validate_role)
+    role = fields.Integer(validate=validate_role)
     username = fields.String(required=True, validate=[validate.Length(max=50)])
-    password = fields.String(required=True, validate=[validate.Length(min=4, max=50)])
+    password = fields.String(required=True)
     is_active = fields.Boolean(dump_only=True)
 
     created_at = fields.DateTime(dump_only=True)

@@ -7,7 +7,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.Integer, default=0)
     username = db.Column(db.String(80), nullable=False, unique=True)
-    password = db.Column(db.String(200))
+    password = db.Column(db.String(200), nullable=False)
     is_active = db.Column(db.Boolean(), default=False)
 
     created_at = db.Column(db.DateTime(), nullable=False, server_default=db.func.now())
@@ -31,4 +31,8 @@ class User(db.Model):
 
     def save(self):
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
         db.session.commit()

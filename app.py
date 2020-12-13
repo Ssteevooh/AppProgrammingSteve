@@ -39,7 +39,7 @@ def register_resources(app):
     api.add_resource(OrderResource, "/order")
     api.add_resource(ConfirmResource, "/confirm")
 
-    api.add_resource(UserResource, "/username/<username>")
+    api.add_resource(UserResource, "/user/<int:user_id>")
     api.add_resource(UserListResource, "/users")
 
     api.add_resource(ProductResource, "/product/<int:product_id>")
