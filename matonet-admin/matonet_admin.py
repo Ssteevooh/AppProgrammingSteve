@@ -19,7 +19,7 @@ class MatonetAdmin(QtWidgets.QWidget):
     def __init__(self):
         super(MatonetAdmin, self).__init__()
         self.init_ui()
-        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+        logging.basicConfig(filename='matonet-admin.log', format='%(asctime)s-%(levelname)s:%(message)s', level=logging.DEBUG)
 
     def init_ui(self):
         path = os.path.dirname(os.path.abspath(__file__)) + '/main_window.ui'
@@ -56,24 +56,31 @@ class MatonetAdmin(QtWidgets.QWidget):
         self.tokens["access_token"] = token["token"]
 
     def on_exit_button_clicked(self):
+        if self.stacked_widget.currentWidget() is not self.login_widget:
+            headers = {"Authorization": "Bearer %s" % self.tokens["access_token"]}
+            requests.post(self.url + "revoke", json={}, headers=headers)
+            logging.info("%s logged out." % self.login_info["username"])
+        
         sys.exit(0)
 
     def on_login_clicked(self, login_info):
+        self.login_info = login_info
         self.url = "http://" + login_info["address"] + ":5000/"
         
         try:
             response = requests.post(self.url + "token", json={
                 "username": login_info["username"], "password": login_info["username"]}, timeout=2)
             self.tokens = json.loads(response.text)
-            headers = {
-                "Authorization": "Bearer %s" % self.tokens["access_token"]
-            }
+            headers = {"Authorization": "Bearer %s" % self.tokens["access_token"]}
             db = requests.get(self.url + "products", headers=headers)
             self.products = json.loads(db.text)
+        except requests.ConnectionError as e:
+            self.login_widget.show_warning(e)
+            return
         except requests.Timeout as e:
             self.login_widget.show_warning(e)
             return
-
+        logging.info("%s logged in." % self.login_info["username"])
         self.stacked_widget.setCurrentWidget(self.product_widget)
         
         for row, product in enumerate(self.products):
