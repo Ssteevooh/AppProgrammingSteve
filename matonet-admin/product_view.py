@@ -79,9 +79,12 @@ class ProductView(QtWidgets.QWidget):
                                 raise ValueError
                         if column in (6,7):
                                 product[self.keys[column]] = item.text()    
-                            
-                    except ValueError:
-                        pass
+                    except TypeError as e:
+                        self.show_warning(e)
+                        return       
+                    except ValueError as e:
+                        self.show_warning(e)
+                        return
 
             if self.product_table_widget.item(row, 0) is not None and item.text != "":
                 products.append(product)
@@ -100,17 +103,17 @@ class ProductView(QtWidgets.QWidget):
                 try:
                     requests.patch(url + "product/%d" % i, headers=headers, json=updated_json)
                 except requests.Timeout as e:
-                    self.product_widget.show_warning(e)
-                    return
+                    self.show_warning(e)
+                    pass
                 except ValueError as e:
-                    self.product_widget.show_warning(e)
-                    return
+                    self.show_warning(e)
+                    pass
                 except TypeError as e:
-                    self.product_widget.show_warning(e)
-                    return
+                    self.show_warning(e)
+                    pass
 
             except Exception as e:
-                self.show_warning
+                self.show_warning(e)
             
 
 
