@@ -1,4 +1,4 @@
-from marshmallow import Schema, post_dump, fields, validate, ValidationError
+from marshmallow import Schema, fields, validate, ValidationError
 
 # TODO get this from the storage table
 storage_free = 10000
@@ -32,4 +32,3 @@ class ProductSchema(Schema):
     size = fields.Integer(validate=validate_size)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
-

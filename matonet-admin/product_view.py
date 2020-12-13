@@ -3,11 +3,9 @@
 __author__ = "topseli"
 __license__ = "0BSD"
 
-
 import os
 import sys
 import requests
-import json
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox
@@ -52,11 +50,10 @@ class ProductView(QtWidgets.QWidget):
         return product
 
     def set_products(self, product, row):
-            for column in range(self.product_table_widget.columnCount()):    
-                item = QtWidgets.QTableWidgetItem()
-                item.setText(str(product[self.keys[column]]))
-                self.product_table_widget.setItem(row,column, item)
-                
+        for column in range(self.product_table_widget.columnCount()):
+            item = QtWidgets.QTableWidgetItem()
+            item.setText(str(product[self.keys[column]]))
+            self.product_table_widget.setItem(row, column, item)
 
     def get_products(self):
         products = []
@@ -66,23 +63,23 @@ class ProductView(QtWidgets.QWidget):
                 item = self.product_table_widget.item(row, column)
                 if item is not None and item.text() != "":
                     try:
-                        if column in (0,3,5):
+                        if column in (0, 3, 5):
                             if int(item.text()) >= 0:
                                 product[self.keys[column]] = int(item.text())
                             else:
                                 raise ValueError
-                        if column in (1,2):
+                        if column in (1, 2):
                             product[self.keys[column]] = item.text()
                         if column == 4:
-                            if float(item.text()) > 0: 
+                            if float(item.text()) > 0:
                                 product[self.keys[column]] = float(item.text())
                             else:
                                 raise ValueError
-                        if column in (6,7):
-                                product[self.keys[column]] = item.text()    
+                        if column in (6, 7):
+                            product[self.keys[column]] = item.text()
                     except TypeError as e:
                         self.show_warning(e)
-                        return       
+                        return
                     except ValueError as e:
                         self.show_warning(e)
                         return
@@ -98,9 +95,7 @@ class ProductView(QtWidgets.QWidget):
                 if updated_products[i] != products[i]:
                     updated_json = self.delete_uneditables(updated_products[i])
                     print(updated_json)
-                headers = {
-                "Authorization": "Bearer %s" % token
-                }
+                headers = {"Authorization": "Bearer %s" % token}
                 try:
                     requests.patch(url + "product/%d" % i, headers=headers, json=updated_json)
                 except requests.Timeout as e:
@@ -115,7 +110,7 @@ class ProductView(QtWidgets.QWidget):
 
             except Exception as e:
                 self.show_warning(e)
-            
+
     @pyqtSlot()
     def on_users_button_clicked(self):
         self.user_signal.emit(1)

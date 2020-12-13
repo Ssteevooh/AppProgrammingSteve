@@ -17,7 +17,7 @@
    <item row="10" column="0" colspan="3">
     <widget class="QLineEdit" name="username_input">
      <property name="text">
-      <string>test</string>
+      <string>admin</string>
      </property>
      <property name="placeholderText">
       <string>username</string>
@@ -47,7 +47,7 @@
    <item row="12" column="0" colspan="3">
     <widget class="QLineEdit" name="password_input">
      <property name="text">
-      <string>test</string>
+      <string>super secret matonet password</string>
      </property>
      <property name="echoMode">
       <enum>QLineEdit::Password</enum>

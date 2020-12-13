@@ -14,6 +14,16 @@ from PyQt5.QtWidgets import QMessageBox
 
 class UserView(QtWidgets.QWidget):
 
+    keys = (
+        "user_id",
+        "role",
+        "username",
+        "password",
+        "is_active",
+        "created_at",
+        "updated_at"
+    )
+
     user_signal = pyqtSignal(int)
 
     def __init__(self):
@@ -34,8 +44,13 @@ class UserView(QtWidgets.QWidget):
 
     @pyqtSlot()
     def on_update_button_clicked(self):
-
         self.user_signal.emit(1)
+
+    def set_users(self, user, row):
+        for column in range(self.user_table_widget.columnCount()):
+            item = QtWidgets.QTableWidgetItem()
+            item.setText(str(user[self.keys[column]]))
+            self.user_table_widget.setItem(row, column, item)
 
     def get_users(self):
         users = []
@@ -45,23 +60,23 @@ class UserView(QtWidgets.QWidget):
                 item = self.user_table_widget.item(row, column)
                 if item is not None and item.text() != "":
                     try:
-                        if column in (0,3,5):
+                        if column in (0, 1):
                             if int(item.text()) >= 0:
                                 user[self.keys[column]] = int(item.text())
                             else:
                                 raise ValueError
-                        if column in (1,2):
+                        if column in (2, 3):
                             user[self.keys[column]] = item.text()
                         if column == 4:
-                            if float(item.text()) > 0: 
-                                user[self.keys[column]] = float(item.text())
+                            if float(item.text()) > 0:
+                                user[self.keys[column]] = bool(item.text())
                             else:
                                 raise ValueError
-                        if column in (6,7):
-                                user[self.keys[column]] = item.text()    
+                        if column in (5, 6):
+                            user[self.keys[column]] = item.text()
                     except TypeError as e:
                         self.show_warning(e)
-                        return       
+                        return
                     except ValueError as e:
                         self.show_warning(e)
                         return
@@ -69,6 +84,8 @@ class UserView(QtWidgets.QWidget):
             if self.user_table_widget.item(row, 0) is not None and item.text != "":
                 users.append(user)
         return users
+
+
 def run():
     APP = QtWidgets.QApplication(sys.argv)
     APP_WINDOW = UserView()

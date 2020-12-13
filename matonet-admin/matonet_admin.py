@@ -9,8 +9,7 @@ from PyQt5 import QtWidgets, uic
 import login_view, product_view, user_view
 import requests
 import json
-import site
-from datetime import datetime
+
 
 class MatonetAdmin(QtWidgets.QWidget):
 
@@ -19,8 +18,14 @@ class MatonetAdmin(QtWidgets.QWidget):
     def __init__(self):
         super(MatonetAdmin, self).__init__()
         self.init_ui()
-        #logging.basicConfig(filename='matonet-admin.log', format='%(asctime)s-%(levelname)s:%(message)s', level=logging.DEBUG)
-        logging.basicConfig(format='%(asctime)s-%(levelname)s:%(message)s', level=logging.DEBUG)
+
+        # Commented out for instant debugging - We'll use this in production
+        """logging.basicConfig(filename='matonet-admin.log',
+                            format='%(asctime)s-%(levelname)s:%(message)s',
+                            level=logging.DEBUG)"""
+
+        logging.basicConfig(format='%(asctime)s-%(levelname)s:%(message)s',
+                            level=logging.DEBUG)
 
     def init_ui(self):
         path = os.path.dirname(os.path.abspath(__file__)) + '/main_window.ui'
@@ -51,26 +56,31 @@ class MatonetAdmin(QtWidgets.QWidget):
             self.on_update_clicked)
         self.product_widget.user_signal.connect(
             self.on_user_clicked)
-    
+
     def login(self, login_info):
-        self.url = "http://" + login_info["address"] + ":5000/"
-        response = requests.post(self.url + "token", json={
-                "username": login_info["username"], "password": login_info["username"]}, timeout=2)
-        self.tokens = json.loads(response.text)
+        try:
+            self.url = "http://" + login_info["address"] + ":5000/"
+            print(login_info)
+            response = requests.post(self.url + "token", json={
+                "username": login_info["username"], "password": login_info["password"]}, timeout=2)
+            self.tokens = json.loads(response.text)
+        except Exception:
+            pass
 
     def logout(self):
         headers = {"Authorization": "Bearer %s" % self.tokens["access_token"]}
         requests.post(self.url + "revoke", json={}, headers=headers)
 
     def fetch_from_db(self, endpoint):
-        self.refresh_token()
-        headers = {"Authorization": "Bearer %s" % self.tokens["access_token"]}
-        return requests.get(self.url + endpoint, headers=headers)
-    
+        try:
+            self.refresh_token()
+            headers = {"Authorization": "Bearer %s" % self.tokens["access_token"]}
+            return requests.get(self.url + endpoint, headers=headers)
+        except Exception:
+            pass
+
     def refresh_token(self):
-        headers = {
-                "Authorization": "Bearer %s" % self.tokens["refresh_token"]
-            }
+        headers = {"Authorization": "Bearer %s" % self.tokens["refresh_token"]}
         response = requests.post(self.url + "refresh", headers=headers)
         token = json.loads(response.text)
         self.tokens["access_token"] = token["token"]
@@ -93,6 +103,10 @@ class MatonetAdmin(QtWidgets.QWidget):
         except requests.Timeout as e:
             self.login_widget.show_warning(e)
             return
+        except AttributeError as e:
+            self.login_widget.show_warning(e)
+            return
+
         logging.info("User %s logged in." % self.user)
         self.stacked_widget.setCurrentWidget(self.product_widget)
         logging.info("User %s is viewing products." % self.user)
@@ -104,9 +118,22 @@ class MatonetAdmin(QtWidgets.QWidget):
             self.refresh_token()
             self.product_widget.update_products(self.products, self.url, self.tokens["access_token"])
             logging.info("products updated by %s" % self.login_info["username"])
+
     def on_user_clicked(self, int):
+        try:
+            user_db = self.fetch_from_db("users")
+            self.users = json.loads(user_db.text)
+        except requests.ConnectionError as e:
+            self.login_widget.show_warning(e)
+            return
+        except requests.Timeout as e:
+            self.login_widget.show_warning(e)
+            return
         self.stacked_widget.setCurrentWidget(self.user_widget)
         logging.info("User %s is viewing users." % self.user)
+        for row, user in enumerate(self.users):
+            self.user_widget.set_users(user, row)
+
 def run():
     APP = QtWidgets.QApplication(sys.argv)
     APP_WINDOW = MatonetAdmin()

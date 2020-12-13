@@ -4,7 +4,7 @@ class Config:
     SECRET_KEY = 'super-secret-key'
 
     # SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://matonet:supermato@localhost:5432/matonet_db'
-    
+
     # FOR REMOTE DATABASE
     SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://matonet:supermato@192.168.160.3:5432/matonet_db'
 
