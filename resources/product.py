@@ -30,7 +30,7 @@ class ProductListResource(Resource):
 
         products = Product.get_all()
 
-        return product_list_schema.dump(products), HTTPStatus.OK
+        return product_list_schema.dump(products).data, HTTPStatus.OK
 
     @jwt_required
     def post(self):
@@ -93,17 +93,17 @@ class ProductResource(Resource):
         if product is None:
             return {'message': 'Product not found'}, HTTPStatus.NOT_FOUND
 
-        product.id = data.get("product_id") or product.product_id
+        product.id = product.product_id
         product.name = data.get("product_name") or product.name
         product.description = data.get("description") or product.description
-        product.steps = data.get("stock") or product.steps
-        product.tools = data.get("price") or product.tools
-        product.cost = data.get("size") or product.cost
-        #product.updated_at = data.get("updated_at")
-
+        product.stock = data.get("stock") or product.stock
+        product.price = data.get("price") or product.price
+        product.size = data.get("size") or product.size
+        product.created_at = product.created_at
+        product.updated_at = product.updated_at
         product.save()
 
-        return product_schema.dump(product), HTTPStatus.OK
+        return {'message': 'Updated'}, HTTPStatus.OK
 
     @jwt_required
     def delete(self, product_id):
