@@ -24,7 +24,8 @@ class UserView(QtWidgets.QWidget):
         "updated_at"
     )
 
-    user_signal = pyqtSignal(int)
+    update_signal = pyqtSignal(int)
+    product_signal = pyqtSignal(int)
 
     def __init__(self):
         super(UserView, self).__init__()
@@ -44,7 +45,11 @@ class UserView(QtWidgets.QWidget):
 
     @pyqtSlot()
     def on_update_button_clicked(self):
-        self.user_signal.emit(1)
+        self.update_signal.emit(1)
+
+    @pyqtSlot()
+    def on_product_button_clicked(self):
+        self.product_signal.emit(1)
 
     def set_users(self, user, row):
         for column in range(self.user_table_widget.columnCount()):

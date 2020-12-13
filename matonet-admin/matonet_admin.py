@@ -56,6 +56,8 @@ class MatonetAdmin(QtWidgets.QWidget):
             self.on_update_clicked)
         self.product_widget.user_signal.connect(
             self.on_user_clicked)
+        self.user_widget.product_signal.connect(
+            self.on_product_clicked)
 
     def login(self, login_info):
         try:
@@ -119,20 +121,22 @@ class MatonetAdmin(QtWidgets.QWidget):
             self.product_widget.update_products(self.products, self.url, self.tokens["access_token"])
             logging.info("products updated by %s" % self.login_info["username"])
 
+    def on_product_clicked(self, int):
+        product_db = self.fetch_from_db("products")
+        self.products = json.loads(product_db.text)
+        self.stacked_widget.setCurrentWidget(self.product_widget)
+        logging.info("User %s is viewing products." % self.user)
+        for row, product in enumerate(self.products):
+            self.product_widget.set_products(product, row)
+
     def on_user_clicked(self, int):
-        try:
-            user_db = self.fetch_from_db("users")
-            self.users = json.loads(user_db.text)
-        except requests.ConnectionError as e:
-            self.login_widget.show_warning(e)
-            return
-        except requests.Timeout as e:
-            self.login_widget.show_warning(e)
-            return
+        user_db = self.fetch_from_db("users")
+        self.users = json.loads(user_db.text)
         self.stacked_widget.setCurrentWidget(self.user_widget)
         logging.info("User %s is viewing users." % self.user)
         for row, user in enumerate(self.users):
             self.user_widget.set_users(user, row)
+
 
 def run():
     APP = QtWidgets.QApplication(sys.argv)
