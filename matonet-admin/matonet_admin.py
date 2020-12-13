@@ -14,6 +14,8 @@ from datetime import datetime
 
 class MatonetAdmin(QtWidgets.QWidget):
 
+    products = []
+
     def __init__(self):
         super(MatonetAdmin, self).__init__()
         self.init_ui()
@@ -45,16 +47,6 @@ class MatonetAdmin(QtWidgets.QWidget):
         self.product_widget.update_signal.connect(
             self.on_update_clicked)
 
-    keys = (
-            "product_id",
-            "product_name",
-            "description",
-            "stock",
-            "price",
-            "size",
-            "created_at",
-            "updated_at"
-        )
     def refresh_token(self):
         headers = {
                 "Authorization": "Bearer %s" % self.tokens["refresh_token"]
@@ -62,44 +54,6 @@ class MatonetAdmin(QtWidgets.QWidget):
         response = requests.post(self.url + "refresh", headers=headers)
         token = json.loads(response.text)
         self.tokens["access_token"] = token["token"]
-
-    def set_products(self, product, row):
-            for column in range(self.product_widget.product_table_widget.columnCount()):    
-                item = QtWidgets.QTableWidgetItem()
-                item.setText(str(product[self.keys[column]]))
-                self.product_widget.product_table_widget.setItem(row,column, item)
-                
-
-    def get_products(self):
-        products = []
-        product = {}
-        for row in range(self.product_widget.product_table_widget.rowCount()):
-            for column in range(self.product_widget.product_table_widget.columnCount()):
-                item = self.product_widget.product_table_widget.item(row, column)
-                if item is not None and item.text() != "":
-                    try:
-                        if column in (0,3,5):
-                            if int(item.text()) > 0:
-                                product[self.keys[column]] = int(item.text())
-                            else:
-                                raise ValueError
-                        if column in (1,2):
-                            product[self.keys[column]] = item.text()
-                        if column == 6:
-                            product[self.keys[column]] = item.text()
-                        if column == 7:
-                            product[self.keys[column]] = datetime.now().isoformat()
-                        if column == 4:
-                            if float(item.text()) > 0: 
-                                product[self.keys[column]] = float(item.text())
-                            else:
-                                raise ValueError
-                    except ValueError:
-                        pass
-
-            if self.product_widget.product_table_widget.item(row, 0) is not None and item.text != "":
-                products.append(product)
-        return products
 
     def on_exit_button_clicked(self):
         sys.exit(0)
@@ -123,29 +77,13 @@ class MatonetAdmin(QtWidgets.QWidget):
         self.stacked_widget.setCurrentWidget(self.product_widget)
         
         for row, product in enumerate(self.products):
-            self.set_products(product, row)
+            self.product_widget.set_products(product, row)
+    
+    def on_update_clicked(self):
+        if self.stacked_widget.currentWidget() is self.product_widget:
+            self.refresh_token()
+            self.product_widget.update_products(self.products, self.url, self.tokens["access_token"])
 
-    def on_update_clicked(self, product_info):
-        updated_products = self.get_products()
-        self.refresh_token()
-        for i in range(len(self.products)):
-            try:
-                if updated_products[i] != self.products[i]:
-                    headers = {
-                        "Authorization": "Bearer %s" % self.tokens["access_token"]
-                    }
-                    try:
-                        print(json.dumps(updated_products[i]))
-                        requests.patch(self.url + "product/%d" % i,headers=headers, json=json.dumps(updated_products[i]))
-                    except requests.Timeout as e:
-                        self.product_widget.show_warning(e)
-                    return
-            except ValueError as e:
-                self.product_widget.show_warning(e)
-                return
-            except TypeError as e:
-                self.product_widget.show_warning(e)
-                return
 
 def run():
     APP = QtWidgets.QApplication(sys.argv)
