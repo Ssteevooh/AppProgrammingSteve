@@ -23,7 +23,6 @@ class UserView(QtWidgets.QWidget):
         "updated_at"
     )
 
-
     def __init__(self):
         super(UserView, self).__init__()
         self.init_ui()
@@ -49,7 +48,7 @@ class UserView(QtWidgets.QWidget):
             "role": 0,
             "username": "",
             "password": "",
-            "is_active": "True",
+            "is_active": False,
             "created_at": "",
             "updated_at": ""
         }
@@ -61,6 +60,11 @@ class UserView(QtWidgets.QWidget):
                         row[self.keys[column]] = int(item.text())
                     else:
                         raise ValueError
+                if column == 4:
+                    if item.text() == "True":
+                        row[self.keys[column]] = True
+                    else:
+                        row[self.keys[column]] = False
                 else:
                     row[self.keys[column]] = item.text()
             else:

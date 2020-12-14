@@ -23,7 +23,6 @@ class ProductView(QtWidgets.QWidget):
         "updated_at"
     )
 
-
     def __init__(self):
         super(ProductView, self).__init__()
         self.init_ui()
