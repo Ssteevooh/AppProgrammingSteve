@@ -27,18 +27,18 @@ class UserListResource(Resource):
     @jwt_required
     def post(self):
 
-        json_data = request.get_json()
-
         current_user = get_jwt_identity()
 
-        # Only for admins
+        json_data = request.get_json()
+        data, errors = user_schema.load(data=json_data)
+        if errors:
+            return {"message": "Validation errors", "errors":  errors}, HTTPStatus.BAD_REQUEST
+
         if current_user is None:
             return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
 
-        data, errors = user_schema.load(data=json_data)
-
-        if errors:
-            return {'message': 'Validation errors', 'errors': errors}, HTTPStatus.BAD_REQUEST
+        if User.get_by_username(data.get("username")):
+            return {"message": "Username already exists."}, HTTPStatus.BAD_REQUEST
 
         user = User(**data)
         user.save()
