@@ -80,9 +80,9 @@ class UserResource(Resource):
 
         if user is None:
             return {'message': 'User not found'}, HTTPStatus.NOT_FOUND
-        user.id = user.user_id
+        user.user_id = user.user_id
         user.role = data.get("role") or user.role
-        user.name = data.get("username") or user.name
+        user.username = data.get("username") or user.username
         user.password = data.get("password") or user.password
         user.is_active = data.get("is_active") or user.is_active
         user.created_at = user.created_at

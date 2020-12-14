@@ -93,14 +93,16 @@ class ProductResource(Resource):
         if product is None:
             return {'message': 'Product not found'}, HTTPStatus.NOT_FOUND
 
-        product.id = product.product_id
-        product.name = data.get("product_name") or product.name
+        product.product_id = product.product_id
+        product.product_name = data.get("product_name") or product.product_name
         product.description = data.get("description") or product.description
         product.stock = data.get("stock") or product.stock
         product.price = data.get("price") or product.price
         product.size = data.get("size") or product.size
         product.created_at = product.created_at
         product.updated_at = product.updated_at
+
+        product = Product(**data)
         product.save()
 
         return {'message': 'Updated'}, HTTPStatus.OK
