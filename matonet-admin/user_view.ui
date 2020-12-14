@@ -68,7 +68,7 @@
     </widget>
    </item>
    <item row="1" column="0" colspan="5">
-    <widget class="QTableWidget" name="user_table_widget">
+    <widget class="QTableWidget" name="table_widget">
      <property name="baseSize">
       <size>
        <width>0</width>

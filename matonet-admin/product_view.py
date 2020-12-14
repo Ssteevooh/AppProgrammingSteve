@@ -6,6 +6,7 @@ __license__ = "0BSD"
 import os
 import sys
 import requests
+from datetime import datetime
 from logger import log
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
@@ -25,8 +26,8 @@ class ProductView(QtWidgets.QWidget):
         "updated_at"
     )
 
-    user_signal = pyqtSignal(int)
-    update_signal = pyqtSignal(list)
+    update_signal = pyqtSignal()
+    user_signal = pyqtSignal()
 
     def __init__(self):
         super(ProductView, self).__init__()
@@ -44,78 +45,59 @@ class ProductView(QtWidgets.QWidget):
         msg.setStandardButtons(QMessageBox.Ok)
         msg.exec_()
 
-    def delete_uneditables(self, product):
-        product.pop("product_id", None)
-        product.pop("created_at", None)
-        product.pop("updated_at", None)
-        return product
+    def row_count(self):
+        rows = 0
+        for row in range(self.table_widget.rowCount()):
+            item = self.table_widget.item(row, 0)
+            if item is not None and item.text() != "":
+                rows += 1
+        return rows
 
-    def set_products(self, product, row):
-        for column in range(self.product_table_widget.columnCount()):
+    def get_row(self, current_row):
+        row = {
+            "product_id": 0,
+            "product_name": "",
+            "description": "",
+            "stock": 0,
+            "price": 0.0,
+            "size": 0,
+            "created_at": "",
+            "updated_at": ""
+        }
+        for column in range(self.table_widget.columnCount()):
+            item = self.table_widget.item(current_row, column)
+            if item is not None and item.text() != "":
+                if column in (0, 3, 5):
+                    if int(item.text()) >= 0:
+                        row[self.keys[column]] = int(item.text())
+                    else:
+                        raise ValueError
+                if column in (1, 2):
+                    row[self.keys[column]] = item.text()
+                if column == 4:
+                    if float(item.text()) > 0:
+                        row[self.keys[column]] = float(item.text())
+                    else:
+                        raise ValueError
+                if column in (6, 7):
+                    row[self.keys[column]] = item.text()
+            else:
+                break
+        return row
+
+    def set_row(self, row_data):
+        for column in range(self.table_widget.columnCount()):
             item = QtWidgets.QTableWidgetItem()
-            item.setText(str(product[self.keys[column]]))
-            self.product_table_widget.setItem(row, column, item)
-
-    def update_products(self, username, products, url, token):
-        updated_products = self.get_products()
-        for i in range(len(products)):
-            try:
-                if updated_products[i] != products[i]:
-                    updated_json = self.delete_uneditables(updated_products[i])
-                    headers = {"Authorization": "Bearer %s" % token}
-                    requests.patch(url + "product/%d" % i, headers=headers, json=updated_json)
-                    log.info("Products updated by %s" % username)
-            except requests.Timeout as e:
-                self.show_warning(e)
-                return
-            except ValueError as e:
-                self.show_warning(e)
-                return
-            except TypeError as e:
-                self.show_warning(e)
-                return
-
-    def get_products(self):
-        products = []
-        product = {}
-        for row in range(self.product_table_widget.rowCount()):
-            for column in range(self.product_table_widget.columnCount()):
-                item = self.product_table_widget.item(row, column)
-                if item is not None and item.text() != "":
-                    try:
-                        if column in (0, 3, 5):
-                            if int(item.text()) >= 0:
-                                product[self.keys[column]] = int(item.text())
-                            else:
-                                raise ValueError
-                        if column in (1, 2):
-                            product[self.keys[column]] = item.text()
-                        if column == 4:
-                            if float(item.text()) > 0:
-                                product[self.keys[column]] = float(item.text())
-                            else:
-                                raise ValueError
-                        if column in (6, 7):
-                            product[self.keys[column]] = item.text()
-                    except TypeError as e:
-                        self.show_warning(e)
-                        return
-                    except ValueError as e:
-                        self.show_warning(e)
-                        return
-
-            if self.product_table_widget.item(row, 0) is not None and item.text != "":
-                products.append(product)
-        return products
+            item.setText(str(row_data[self.keys[column]]))
+            self.table_widget.setItem(row_data["product_id"], column, item)
 
     @pyqtSlot()
     def on_users_button_clicked(self):
-        self.user_signal.emit(1)
+        self.user_signal.emit()
 
     @pyqtSlot()
     def on_update_button_clicked(self):
-        products = self.get_products()
-        self.update_signal.emit(products)
+        self.update_signal.emit()
 
 
 def run():

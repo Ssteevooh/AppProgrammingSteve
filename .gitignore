@@ -5,4 +5,6 @@ __pycache__
 migrations
 .DS_Store
 Matonet.code-workspace
+config.py
 *.log
+
