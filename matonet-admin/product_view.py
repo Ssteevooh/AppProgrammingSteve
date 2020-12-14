@@ -5,9 +5,6 @@ __license__ = "0BSD"
 
 import os
 import sys
-import requests
-from datetime import datetime
-from logger import log
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox
@@ -26,8 +23,6 @@ class ProductView(QtWidgets.QWidget):
         "updated_at"
     )
 
-    update_signal = pyqtSignal()
-    user_signal = pyqtSignal()
 
     def __init__(self):
         super(ProductView, self).__init__()
@@ -46,12 +41,7 @@ class ProductView(QtWidgets.QWidget):
         msg.exec_()
 
     def row_count(self):
-        rows = 0
-        for row in range(self.table_widget.rowCount()):
-            item = self.table_widget.item(row, 0)
-            if item is not None and item.text() != "":
-                rows += 1
-        return rows
+        return self.table_widget.rowCount()
 
     def get_row(self, current_row):
         row = {
@@ -66,7 +56,7 @@ class ProductView(QtWidgets.QWidget):
         }
         for column in range(self.table_widget.columnCount()):
             item = self.table_widget.item(current_row, column)
-            if item is not None and item.text() != "":
+            if item is not None and len(item.text()) > 0:
                 if column in (0, 3, 5):
                     if int(item.text()) >= 0:
                         row[self.keys[column]] = int(item.text())
@@ -82,7 +72,7 @@ class ProductView(QtWidgets.QWidget):
                 if column in (6, 7):
                     row[self.keys[column]] = item.text()
             else:
-                break
+                raise ValueError
         return row
 
     def set_row(self, row_data):
@@ -90,14 +80,6 @@ class ProductView(QtWidgets.QWidget):
             item = QtWidgets.QTableWidgetItem()
             item.setText(str(row_data[self.keys[column]]))
             self.table_widget.setItem(row_data["product_id"], column, item)
-
-    @pyqtSlot()
-    def on_users_button_clicked(self):
-        self.user_signal.emit()
-
-    @pyqtSlot()
-    def on_update_button_clicked(self):
-        self.update_signal.emit()
 
 
 def run():

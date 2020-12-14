@@ -63,15 +63,21 @@ class MatonetAdmin(QtWidgets.QWidget):
         # Connect signals
         self.login_widget.login_signal.connect(
             self.on_login_clicked)
-        self.product_widget.update_signal.connect(
+        self.product_widget.update_button.clicked.connect(
             self.on_update_clicked)
-        self.product_widget.user_signal.connect(
+        self.user_widget.update_button.clicked.connect(
+            self.on_update_clicked)
+        self.product_widget.users_button.clicked.connect(
             self.on_user_clicked)
-        self.user_widget.product_signal.connect(
+        self.user_widget.product_button.clicked.connect(
             self.on_product_clicked)
 
     def delete_static_fields(self, row):
-        row.pop("product_id", None)
+        if self.stacked_widget.currentWidget() is self.product_widget:
+            row.pop("product_id", None)
+        if self.stacked_widget.currentWidget() is self.user_widget:
+            row.pop("user_id", None)
+
         row.pop("created_at", None)
         row.pop("updated_at", None)
 
@@ -108,15 +114,23 @@ class MatonetAdmin(QtWidgets.QWidget):
 
     def check_changes(self):
         if self.stacked_widget.currentWidget() is self.product_widget:
-            endpoint = "products"
+            endpoint = "product"
         if self.stacked_widget.currentWidget() is self.user_widget:
-            endpoint = "users"
-        db_data = self.fetch_from_db(endpoint)
+            endpoint = "user"
+
         ui_data = []
         for row in range(self.stacked_widget.currentWidget().row_count()):
-            row_data = self.stacked_widget.currentWidget().get_row(row)
-            if db_data[row] != row_data:
-                ui_data.append(row_data)
+
+            try:
+                row_data = self.stacked_widget.currentWidget().get_row(row)
+                db_data = self.fetch_from_db(endpoint + "/%d" % (row_data[endpoint + "_id"]))
+            except ValueError:
+                row_data = None
+            if row_data is not None:
+                for key in row_data.keys():
+                    if db_data[0][key] != row_data[key]:
+                        ui_data.append(row_data)
+
         return ui_data
 
     def load_table(self):
@@ -131,7 +145,6 @@ class MatonetAdmin(QtWidgets.QWidget):
 
     def update_db(self, rows_to_update):
         for row in range(len(rows_to_update)):
-
             if self.stacked_widget.currentWidget() is self.product_widget:
                 endpoint = "product"
                 index = rows_to_update[row]["product_id"]
@@ -143,7 +156,7 @@ class MatonetAdmin(QtWidgets.QWidget):
             response = requests.patch(self.url + endpoint + "/%d" % index, headers=headers,
                                       json=rows_to_update[row])
             if response.status_code == 200:
-                log.info("Update updated %s %s" %(endpoint, str(index)))
+                log.info("User %s updated %s %s" % (self.user, endpoint, str(index)))
 
     def on_exit_button_clicked(self):
         if self.stacked_widget.currentWidget() is not self.login_widget:
@@ -162,6 +175,7 @@ class MatonetAdmin(QtWidgets.QWidget):
         changed_rows = self.check_changes()
         if changed_rows:
             self.update_db(changed_rows)
+            changed_rows = None
         else:
             log.info("Nothing to update")
 
